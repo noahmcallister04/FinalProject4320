@@ -1,0 +1,57 @@
+{% extends "base.html"%}
+
+{% block content %}
+<div class="container">
+    <h1>Reserve Your Seat</h1>
+
+    <h3 style="margin-top: 20px;">Seating Chart</h3>
+    <p style="margin: 10px 0;"><strong>X = Reserved Seat, 0 = Available Seat</strong></p>
+
+    <div style="font-family: monospace; margin: 20px 0; background-color: #f5f5f5; padding: 15px; white-space: pre;">
+{% for i in range(12) %}
+[ {{ 'X' if seating_chart[i][0] == 'X' else 'O' }}, {{ 'X' if seating_chart[i][1] == 'X' else 'O' }}, {{ 'X' if seating_chart[i][2] == 'X' else 'O' }}, {{ 'X' if seating_chart[i][3] == 'X' else 'O' }} ]
+{% endfor %}
+    </div>
+
+    <h3 style="margin-top: 30px;">Price Chart (Row x Column)</h3>
+    <div style="font-family: monospace; margin: 20px 0; background-color: #f5f5f5; padding: 15px; white-space: pre;">
+{% for i in range(12) %}
+[ ${{ cost_matrix[i][0] }}, ${{ cost_matrix[i][1] }}, ${{ cost_matrix[i][2] }}, ${{ cost_matrix[i][3] }} ]
+{% endfor %}
+    </div>
+
+    <form method="POST" action="{{ url_for('make_reservation') }}" style="margin-top: 30px;">
+        <div style="margin-bottom: 15px;">
+            <label for="first_name">First Name:</label><br>
+            <input type="text" id="first_name" name="first_name" required style="padding: 5px; width: 300px;">
+        </div>
+
+        <div style="margin-bottom: 15px;">
+            <label for="last_name">Last Name:</label><br>
+            <input type="text" id="last_name" name="last_name" required style="padding: 5px; width: 300px;">
+        </div>
+
+        <div style="margin-bottom: 15px;">
+            <label for="seat_row">Choose a Row (1-12):</label><br>
+            <select id="seat_row" name="seat_row" required style="padding: 5px; width: 150px;">
+                <option value="">Choose a row...</option>
+                {% for i in range(12) %}
+                <option value="{{ i }}">{{ i + 1 }}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div style="margin-bottom: 15px;">
+            <label for="seat_column">Choose a Column (1-4):</label><br>
+            <select id="seat_column" name="seat_column" required style="padding: 5px; width: 150px;">
+                <option value="">Choose a clumn...</option>
+                {% for i in range(4) %}
+                <option value="{{ i }}">{{ i + 1 }}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <button type="submit">Reserve Seat</button>
+    </form>
+</div>
+{% endblock %}
