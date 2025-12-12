@@ -2,6 +2,7 @@ from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask import render_template
 from flask import request, flash
+from flask import session, redirect, url_for
 from datetime import datetime
 import secrets
 import os
@@ -181,6 +182,61 @@ def make_reservation():
     return render_template('reservation.html', 
                          seating_chart=seating_chart, 
                          cost_matrix=cost_matrix)
+
+@app.route('/admin/login', methods=['GET', 'POST'])
+def admin_login():
+    """Admin login page and dashboard combined"""
+    # Check if already logged in
+    if session.get('admin_logged_in'):
+        # Show dashboard
+        seating_chart = get_seating_chart()
+        total_sales = calculate_total_sales()
+        reservations = Reservation.query.all()
+        
+        return render_template('admin.html', 
+                             logged_in=True,
+                             seating_chart=seating_chart, 
+                             total_sales=total_sales,
+                             reservations=reservations)
+    
+    # Handle login attempt
+    if request.method == 'POST':
+        username = request.form.get('username')
+        password = request.form.get('password')
+        
+        if not username or not password:
+            flash('You must enter a username', 'error')
+            return render_template('admin.html', logged_in=False)
+        
+        admin = Admin.query.filter_by(username=username, password=password).first()
+        
+        if admin:
+            session['admin_logged_in'] = True
+            session['admin_username'] = username
+            
+            # Show dashboard after successful login
+            seating_chart = get_seating_chart()
+            total_sales = calculate_total_sales()
+            reservations = Reservation.query.all()
+            
+            return render_template('admin.html', 
+                                 logged_in=True,
+                                 seating_chart=seating_chart, 
+                                 total_sales=total_sales,
+                                 reservations=reservations)
+        else:
+            flash('Invalid credentials', 'error')
+    
+    # Show login form
+    return render_template('admin.html', logged_in=False)
+
+@app.route('/admin/logout')
+def admin_logout():
+    """Logout admin"""
+    session.pop('admin_logged_in', None)
+    session.pop('admin_username', None)
+    flash('You have been logged out', 'success')
+    return redirect(url_for('index'))
 
 if __name__ == '__main__':
     init_db()
