@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container">
+    <h1>Reserve Your Seat</h1>
+    
+    <div style="background-color: #d4edda; padding: 20px; margin: 20px 0; border: 1px solid #c3e6cb;">
+        <p style="margin-bottom: 10px;">Congratulations {{ passenger_name }}! Row: {{ seat_row + 1 }}, Seat: {{ seat_column + 1 }} is now reserved for you! Enjoy your trip!</p>
+        <p><strong>Your e-ticket number is: {{ eticket_number }}</strong></p>
+    </div>
+    
+    <div style="margin-top: 20px;">
+        <a href="{{ url_for('index') }}" style="color: #d9534f; text-decoration: none;">Return to Home</a>
+    </div>
+</div>
+{% endblock %}
