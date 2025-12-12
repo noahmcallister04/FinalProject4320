@@ -1,6 +1,7 @@
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask import render_template
+from flask import request, flash
 from datetime import datetime
 import secrets
 import os
@@ -113,6 +114,73 @@ def generate_eticket_number():
 def index():
     """Main menu page"""
     return render_template('index.html')
+
+@app.route('/reservation', methods=['GET', 'POST'])
+def make_reservation():
+    """Make a reservation page"""
+    seating_chart = get_seating_chart()
+    cost_matrix = get_cost_matrix()
+    
+    if request.method == 'POST':
+        first_name = request.form.get('first_name', '').strip()
+        last_name = request.form.get('last_name', '').strip()
+        seat_row = request.form.get('seat_row')
+        seat_column = request.form.get('seat_column')
+        
+        # Validation
+        if not first_name or not last_name:
+            flash('First name and last name are required', 'error')
+            return render_template('reservation.html', 
+                                 seating_chart=seating_chart, 
+                                 cost_matrix=cost_matrix)
+        
+        try:
+            seat_row = int(seat_row)
+            seat_column = int(seat_column)
+        except (ValueError, TypeError):
+            flash('Invalid seat selection', 'error')
+            return render_template('reservation.html', 
+                                 seating_chart=seating_chart, 
+                                 cost_matrix=cost_matrix)
+        
+        # Check if seat is valid
+        if not (0 <= seat_row < 12 and 0 <= seat_column < 4):
+            flash('Invalid seat selection', 'error')
+            return render_template('reservation.html', 
+                                 seating_chart=seating_chart, 
+                                 cost_matrix=cost_matrix)
+        
+        # Check if seat is available
+        if not is_seat_available(seat_row, seat_column):
+            flash('This seat is already reserved. Please choose another seat.', 'error')
+            return render_template('reservation.html', 
+                                 seating_chart=seating_chart, 
+                                 cost_matrix=cost_matrix)
+        
+        # Create reservation
+        passenger_name = f"{first_name} {last_name}"
+        eticket_number = generate_eticket_number()
+        
+        new_reservation = Reservation(
+            passengerName=passenger_name,
+            seatRow=seat_row,
+            seatColumn=seat_column,
+            eTicketNumber=eticket_number
+        )
+        
+        db.session.add(new_reservation)
+        db.session.commit()
+        
+        # Show confirmation
+        return render_template('confirmation.html', 
+                             passenger_name=passenger_name,
+                             seat_row=seat_row,
+                             seat_column=seat_column,
+                             eticket_number=eticket_number)
+    
+    return render_template('reservation.html', 
+                         seating_chart=seating_chart, 
+                         cost_matrix=cost_matrix)
 
 if __name__ == '__main__':
     init_db()
