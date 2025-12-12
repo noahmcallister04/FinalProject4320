@@ -31,5 +31,27 @@ class Admin(db.Model):
     username = db.Column(db.Text, primary_key=True)
     password = db.Column(db.Text, nullable=False)
 
+def init_db():
+    """Initialize the database with tables"""
+    with app.app_context():
+        print(f"Initializing database at: {database_path}")
+        db.create_all()
+        print("Database tables created/verified")
+        
+        # Add a default admin if none exists
+        try:
+            admin_count = Admin.query.count()
+            if admin_count == 0:
+                default_admin = Admin(username='admin', password='admin123')
+                db.session.add(default_admin)
+                db.session.commit()
+                print("Default admin created (username: admin, password: admin123)")
+            else:
+                print(f"Found {admin_count} admin account(s) in database")
+        except Exception as e:
+            print(f"Note: {e}")
+
+
 if __name__ == '__main__':
+    init_db()
     app.run(debug=True, port=5000)
