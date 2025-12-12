@@ -1,5 +1,6 @@
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
+from flask import render_template
 from datetime import datetime
 import secrets
 import os
@@ -107,6 +108,11 @@ def generate_eticket_number():
     Generate a unique e-ticket number
     """
     return secrets.token_hex(6).upper()
+
+@app.route('/')
+def index():
+    """Main menu page"""
+    return render_template('index.html')
 
 if __name__ == '__main__':
     init_db()
