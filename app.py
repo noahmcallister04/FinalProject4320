@@ -1,5 +1,6 @@
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
+from datetime import datetime
 import os
 
 app = Flask(__name__)
@@ -14,6 +15,21 @@ app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{database_path}'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db = SQLAlchemy(app)
+
+# Database Models
+class Reservation(db.Model):
+    __tablename__ = 'reservations'
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    passengerName = db.Column(db.Text, nullable=False)
+    seatRow = db.Column(db.Integer, nullable=False)
+    seatColumn = db.Column(db.Integer, nullable=False)
+    eTicketNumber = db.Column(db.Text, nullable=False)
+    created = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
+
+class Admin(db.Model):
+    __tablename__ = 'admins'
+    username = db.Column(db.Text, primary_key=True)
+    password = db.Column(db.Text, nullable=False)
 
 if __name__ == '__main__':
     app.run(debug=True, port=5000)
