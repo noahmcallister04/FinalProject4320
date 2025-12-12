@@ -31,6 +31,40 @@ class Admin(db.Model):
     username = db.Column(db.Text, primary_key=True)
     password = db.Column(db.Text, nullable=False)
 
+# Cost Matrix Function
+def get_cost_matrix():
+    '''
+    Function to generate cost matrix for flights
+    Input: none
+    Output: Returns a 12 x 4 matrix of prices
+    '''
+    cost_matrix = [[100, 75, 50, 100] for row in range(12)]
+    return cost_matrix
+
+# Helper Functions
+def get_seating_chart():
+    """
+    Creates a seating chart with reservation status
+    Returns a 12x4 matrix with 'X' for reserved seats and 'O' for available seats
+    """
+    reservations = Reservation.query.all()
+    chart = [['O' for col in range(4)] for row in range(12)]
+    
+    for reservation in reservations:
+        row = reservation.seatRow
+        col = reservation.seatColumn
+        if 0 <= row < 12 and 0 <= col < 4:
+            chart[row][col] = 'X'
+    
+    return chart
+
+def is_seat_available(row, col):
+    """
+    Check if a seat is available
+    """
+    reservation = Reservation.query.filter_by(seatRow=row, seatColumn=col).first()
+    return reservation is None
+
 def init_db():
     """Initialize the database with tables"""
     with app.app_context():
