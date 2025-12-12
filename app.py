@@ -1,6 +1,7 @@
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
+import secrets
 import os
 
 app = Flask(__name__)
@@ -85,6 +86,27 @@ def init_db():
         except Exception as e:
             print(f"Note: {e}")
 
+def calculate_total_sales():
+    """
+    Calculate total sales based on all reservations
+    """
+    reservations = Reservation.query.all()
+    cost_matrix = get_cost_matrix()
+    total = 0
+    
+    for reservation in reservations:
+        row = reservation.seatRow
+        col = reservation.seatColumn
+        if 0 <= row < 12 and 0 <= col < 4:
+            total += cost_matrix[row][col]
+    
+    return total
+
+def generate_eticket_number():
+    """
+    Generate a unique e-ticket number
+    """
+    return secrets.token_hex(6).upper()
 
 if __name__ == '__main__':
     init_db()
