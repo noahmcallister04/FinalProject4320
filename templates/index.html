@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container">
+    <h1>IT-4320 Trip Reservation System</h1>
+    <p style="margin: 20px 0;">Welcome to the IT-4320 reservation system. Use the select box to choose whether to make a reservation or log in as administrator.</p>
+    
+    <form action="" method="get" style="margin: 20px 0;">
+        <label for="menu_option">Choose Menu Option:</label><br>
+        <select id="menu_option" name="option" style="padding: 5px; margin: 10px 0; width: 200px;">
+            <option value="">Choose an option...</option>
+            <option value="reserve">Reserve a Seat</option>
+            <option value="admin">Admin Login</option>
+        </select><br>
+        <button type="button" onclick="handleMenuSelection()" style="margin-top: 10px;">Submit</button>
+    </form>
+</div>
+
+<script>
+function handleMenuSelection() {
+    var select = document.getElementById('menu_option');
+    var option = select.value;
+    
+    if (option === 'reserve') {
+        window.location.href = "{{ url_for('make_reservation') }}";
+    } else if (option === 'admin') {
+        window.location.href = "{{ url_for('admin_login') }}";
+    } else {
+        alert('Please select an option');
+    }
+}
+</script>
+{% endblock %}
