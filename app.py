@@ -238,6 +238,18 @@ def admin_logout():
     flash('You have been logged out', 'success')
     return redirect(url_for('index'))
 
+@app.route('/admin/delete_reservation/<int:reservation_id>', methods=['POST'])
+def delete_reservation(reservation_id):
+    """Delete a reservation"""
+    if not session.get('admin_logged_in'):
+        return redirect(url_for('admin_login'))
+    
+    reservation = Reservation.query.get_or_404(reservation_id)
+    db.session.delete(reservation)
+    db.session.commit()
+    flash('Reservation deleted successfully', 'success')
+    
+    return redirect(url_for('admin_login'))
 if __name__ == '__main__':
     init_db()
     app.run(debug=True, port=5000)
