@@ -1,2 +1,2 @@
-echo "Flask==3.0.0
-Flask-SQLAlchemy==3.1.1" > requirements.txt
+Flask==3.0.0
+Flask-SQLAlchemy==3.1.1
